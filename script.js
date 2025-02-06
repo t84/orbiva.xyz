@@ -29,6 +29,103 @@ function updateStatusIndicator(status) {
         statusElement.textContent = 'I am currently offline on Discord.';
     }
 }
+function fetchRSSFeed(rssUrl, targetElement) {
+    console.log("Fetching RSS from:", rssUrl); 
+  
+    fetch(rssUrl)
+      .then(response => {
+        console.log("Response status:", response.status); 
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`); 
+        }
+        return response.text();
+      })
+      .then(str => {
+        console.log("XML String (first 200 chars):", str.substring(0, 200)); 
+        const xmlDoc = new window.DOMParser().parseFromString(str, "text/xml");
+        console.log("Parsed XML:", xmlDoc); 
+  
+        const errorNode = xmlDoc.querySelector("parsererror"); 
+        if (errorNode) {
+          console.error("XML Parsing Error:", errorNode.textContent);
+          throw new Error("Invalid RSS feed format");
+        }
+  
+        const items = xmlDoc.querySelectorAll("item");
+        const targetList = document.querySelector(targetElement);
+  
+        if (!targetList) {
+          console.error("Target element not found:", targetElement);
+          return;
+        }
+        targetList.innerHTML = ""; 
+  
+        if (items.length === 0) {
+          const listItem = document.createElement("li");
+          listItem.innerHTML = `
+            <span class="title">No Blogs yet :(</span>
+            <span class="bar"></span>
+            <span class="date">${new Date().toLocaleDateString()}</span> 
+          `;
+          targetList.appendChild(listItem);
+          return;
+        }
+  
+        const recentItems = Array.from(items).slice(0, 5);
+  
+        recentItems.forEach(item => {
+          const title = item.querySelector("title")?.textContent || "No Title Available"; 
+          const link = item.querySelector("link")?.textContent || "#"; 
+          const date = item.querySelector("pubDate")?.textContent; 
+  
+          const formattedDate = date ? formatDate(date) : new Date().toLocaleDateString();
+          
+  
+          const listItem = document.createElement("li");
+          listItem.innerHTML = `
+            <span class="title"><a target="_blank" href="${link}">${title}</a></span>
+            <span class="bar"></span>
+            <span class="date">${formattedDate}</span>
+          `;
+          targetList.appendChild(listItem);
+        });
+      })
+      .catch(error => {
+        console.error("Fetch or Parse Error:", error);
+        const targetList = document.querySelector(targetElement);
+        if (targetList) {
+          targetList.innerHTML = `<li><span class="title">Error loading blogs: ${error.message}</span></li>`; 
+        }
+      });
+  }
+  
+  function formatDate(dateString) {
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate();
+      const month = date.getMonth() + 1; 
+      const year = date.getFullYear();
+  
+      const paddedDay = day < 10 ? '0' + day : day;
+      const paddedMonth = month < 10 ? '0' + month : month;
+  
+  
+      return `${paddedMonth}-${paddedDay}-${year}`;
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      const today = new Date();
+      const todayDay = today.getDate();
+      const todayMonth = today.getMonth() + 1;
+      const todayYear = today.getFullYear();
+      const paddedTodayDay = todayDay < 10 ? '0' + todayDay : todayDay;
+      const paddedTodayMonth = todayMonth < 10 ? '0' + todayMonth : todayMonth;
+      return `${paddedTodayMonth}-${paddedTodayDay}-${todayYear}`;
+    }
+  }
+  const rssFeedUrl = "https://corsproxy.io/?url=https://orbiva.bearblog.dev/rss/"; 
+  const targetElementSelector = ".writing-list";
+  
+  fetchRSSFeed(rssFeedUrl, targetElementSelector);
 
 setInterval(fetchDiscordStatus, 5000);
 
