@@ -23,10 +23,10 @@ function updateStatusIndicator(status) {
 
     if (status === 'online' || status === 'idle' || status === 'dnd') {
         statusElement.classList.add('online');
-        statusElement.textContent = 'I am currently online on Discord.';
+        statusElement.textContent = 'I am currently online.';
     } else {
         statusElement.classList.add('offline');
-        statusElement.textContent = 'I am currently offline on Discord.';
+        statusElement.textContent = 'I am currently offline.';
     }
 }
 function fetchRSSFeed(rssUrl, targetElement) {
@@ -126,6 +126,46 @@ function fetchRSSFeed(rssUrl, targetElement) {
   const targetElementSelector = ".writing-list";
   
   fetchRSSFeed(rssFeedUrl, targetElementSelector);
+
+function calculatePreciseAge(birthdate) {
+    let now = new Date();
+    let birthTime = new Date(birthdate).getTime();
+    let nowTime = now.getTime();
+
+    let ageInMilliseconds = nowTime - birthTime;
+    let ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25); 
+
+    return ageInYears.toFixed(10);
+}
+
+function updateAge() {
+    document.getElementById("age").textContent = calculatePreciseAge("2002-07-22T00:00:00");
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const text = "Hey I'm Orbiva!";
+  const typingElement = document.getElementById("typing-text");
+  let index = 0;
+
+  function typeText() {
+      if (index < text.length) {
+          typingElement.innerHTML = text.substring(0, index + 1) + '<span class="typing-cursor"></span>';
+          index++;
+          setTimeout(typeText, 100);
+      } else {
+          setTimeout(() => {
+              typingElement.innerHTML = text + '<span class="typing-cursor"></span>';
+          }, 500);
+      }
+  }
+
+  typeText();
+});
+
+
+setInterval(updateAge, 50);
+
+updateAge();
 
 setInterval(fetchDiscordStatus, 5000);
 

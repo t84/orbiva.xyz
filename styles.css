@@ -84,26 +84,20 @@ h1 {
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
-    border-right: 3px solid white;
-    width: 0;
-    animation: typing 2s steps(20) 1s forwards, blink-caret 0.75s step-end infinite;
     padding-right: 5px;
     line-height: 1.1;
 }
 
-@keyframes typing {
-    from {
-        width: 0;
-    }
-    to {
-        width: var(--text-width);
-    }
-}
 
 @keyframes blink-caret {
     50% {
         border-color: transparent;
     }
+}
+
+.typing-cursor {
+    border-right: 3px solid white;
+    animation: blink-caret 0.75s step-end infinite;
 }
 
 .section {
@@ -135,18 +129,6 @@ h1 {
     padding: 0;
 }
 
-.writing-list li {
-    margin-bottom: 15px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-}
-
-.work-list li {
-    margin-bottom: 15px;
-    font-size: 14px;
-    align-items: center;
-}
 h2 a {
     color: #cccccc;
     text-decoration: underline;
@@ -173,14 +155,33 @@ h2 a:hover {
     display: inline-block;
 }
 
-.writing-list li .date {
+.writing-list li .date,
+.work-list li .date {
     color: #888888;
     padding-left: 10px;
+}
+
+.writing-list li,
+.work-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 14px;
 }
 
 .writing-list li .bar {
     height: 1px;
     background-color: #444;
-    flex-grow: 10;
-    margin-left: 10px;
+    flex-grow: 100;
+    margin-right: 2px;
 }
+
+.work-list li .bar {
+    height: 1px;
+    background-color: #444;
+    flex-grow: 100;
+    margin-left: 10px;
+    margin-right: 2px;
+}
+
+
